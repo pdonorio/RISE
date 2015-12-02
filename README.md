@@ -78,6 +78,9 @@ shortcut does not select the next cell, but will only run the cell (same as
 and because some problem arises when you inject new cells on the fly.
 When you exit the presentation mode, the behaviour comes back to normal.
 
+4- Darkish themes have css conflict with the notebook css, so it need customization
+to make them work.
+
 ## Manual installation
 
 We encourage you to use the setup.py-based installation (see above), but if you
@@ -134,6 +137,19 @@ There are also options for `controls`, `progress`, `history`, `minScale` and
 
 **Note**: The use of the `minScale` option (values other then `1.0`) can cause
 problems with codemirror.
+
+### Alternative configuration method
+You can put reveal.js configuration in your notebook metadata (Edit->Edit Notebook Metadata) like this:
+```
+{
+    "livereveal": {
+        "theme": "serif",
+        "transition": "zoom",
+        ...
+    },
+    "kernelspec": {...}
+}
+```
 
 ## Usage with Leap Motion
 

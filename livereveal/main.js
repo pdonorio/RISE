@@ -18,9 +18,7 @@ define([
 var config_section = new configmod.ConfigSection('livereveal',
                             {base_url: utils.get_body_data("baseUrl")});
 
-config_section.load();
-
-var config = new configmod.ConfigWithDefaults(config_section, {
+var default_config = {
     controls: true,
     progress: true,
     history: true,
@@ -31,7 +29,15 @@ var config = new configmod.ConfigWithDefaults(config_section, {
     transition: 'linear',
     slideNumber: true,
     start_slideshow_at: 'beginning',
-});
+    scroll: false,
+};
+
+config_section.load();
+
+if(IPython.notebook.metadata.livereveal !== undefined){
+    default_config = $.extend(true, default_config, IPython.notebook.metadata.livereveal);
+}
+var config = new configmod.ConfigWithDefaults(config_section, default_config);
 
 Object.getPrototypeOf(IPython.notebook).get_cell_elements = function () {
   /*
@@ -156,6 +162,12 @@ function Revealer() {
   //$('div#header').hide();
   //$('div#site').css("height", "100%");
   //$('div#ipython-main-app').css("position", "static");
+  // Set up the scrolling feature
+  var scroll = config.get_sync('scroll');
+  if (scroll === true) {
+    $('body').css("overflow-y", "auto");
+    $('body').css("overflow-x", "hidden");
+  }
   $('div#notebook').addClass("reveal");
   $('div#notebook-container').addClass("slides");
 
@@ -335,9 +347,18 @@ function Remover() {
   Reveal.configure({minScale: 1.0});
   Reveal.removeEventListeners();
   $('body').removeClass("rise-enabled");
+
+  var scroll = config.get_sync('scroll');
+  if (scroll === true) {
+    $('body').css("overflow-y", "");
+    $('body').css("overflow-x", "");
+  }
+
   IPython.menubar._size_header();
 
   $('div#notebook').removeClass("reveal");
+  // woekaround to fix fade class conflicting between notebook and reveal css...
+  if ($('div#notebook').hasClass('fade')) { $('div#notebook').removeClass("fade"); };
   $('div#notebook-container').removeClass("slides");
   $('div#notebook-container').css('width','');
   $('div#notebook-container').css('height','');
